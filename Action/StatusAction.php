@@ -30,12 +30,18 @@ class StatusAction implements ActionInterface
 
             return;
         }
-
-        // means we have only received a stripe token but have not done a payment.
+        //mark authorized is never triggered in the bundle so then succeeded stipe payments stay on pending status
         if (is_string($model['card'])) {
-            $request->markPending();
 
-            return;
+            if ($model['card'] && !$model['refunded'] && $model['status'] === 'succeeded'){
+                $request->markAuthorized ();
+                return;
+            }else{
+                $request->markPending();
+                return;
+            }
+
+            
         }
 
         if (is_array($model['card']) && $model['captured'] && $model['paid']) {
