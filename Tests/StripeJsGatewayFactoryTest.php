@@ -1,18 +1,18 @@
 <?php
 namespace Payum\Stripe\Tests;
 
-use Payum\Stripe\JsPaymentFactory;
+use Payum\Stripe\StripeJsGatewayFactory;
 
-class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
+class StripeJsGatewayFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
-    public function shouldImplementJsPaymentFactoryInterface()
+    public function shouldImplementJsGatewayFactoryInterface()
     {
-        $rc = new \ReflectionClass('Payum\Stripe\JsPaymentFactory');
+        $rc = new \ReflectionClass('Payum\Stripe\StripeJsGatewayFactory');
 
-        $this->assertTrue($rc->implementsInterface('Payum\Core\PaymentFactoryInterface'));
+        $this->assertTrue($rc->implementsInterface('Payum\Core\GatewayFactoryInterface'));
     }
 
     /**
@@ -20,73 +20,73 @@ class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function couldBeConstructedWithoutAnyArguments()
     {
-        new JsPaymentFactory();
+        new StripeJsGatewayFactory();
     }
 
     /**
      * @test
      */
-    public function shouldCreateCorePaymentFactoryIfNotPassed()
+    public function shouldCreateCoreGatewayFactoryIfNotPassed()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
-        $this->assertAttributeInstanceOf('Payum\Core\PaymentFactory', 'corePaymentFactory', $factory);
+        $this->assertAttributeInstanceOf('Payum\Core\GatewayFactory', 'coreGatewayFactory', $factory);
     }
 
     /**
      * @test
      */
-    public function shouldUseCorePaymentFactoryPassedAsSecondArgument()
+    public function shouldUseCoreGatewayFactoryPassedAsSecondArgument()
     {
-        $corePaymentFactory = $this->getMock('Payum\Core\PaymentFactoryInterface');
+        $coreGatewayFactory = $this->getMock('Payum\Core\GatewayFactoryInterface');
 
-        $factory = new JsPaymentFactory(array(), $corePaymentFactory);
+        $factory = new StripeJsGatewayFactory(array(), $coreGatewayFactory);
 
-        $this->assertAttributeSame($corePaymentFactory, 'corePaymentFactory', $factory);
+        $this->assertAttributeSame($coreGatewayFactory, 'coreGatewayFactory', $factory);
     }
 
     /**
      * @test
      */
-    public function shouldAllowCreatePayment()
+    public function shouldAllowCreateGateway()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
-        $payment = $factory->create(array('publishable_key' => 'aPubKey', 'secret_key' => 'aSecretKey'));
+        $gateway = $factory->create(array('publishable_key' => 'aPubKey', 'secret_key' => 'aSecretKey'));
 
-        $this->assertInstanceOf('Payum\Core\Payment', $payment);
+        $this->assertInstanceOf('Payum\Core\Gateway', $gateway);
 
-        $this->assertAttributeNotEmpty('apis', $payment);
-        $this->assertAttributeNotEmpty('actions', $payment);
+        $this->assertAttributeNotEmpty('apis', $gateway);
+        $this->assertAttributeNotEmpty('actions', $gateway);
 
-        $extensions = $this->readAttribute($payment, 'extensions');
+        $extensions = $this->readAttribute($gateway, 'extensions');
         $this->assertAttributeNotEmpty('extensions', $extensions);
     }
 
     /**
      * @test
      */
-    public function shouldAllowCreatePaymentWithCustomApi()
+    public function shouldAllowCreateGatewayWithCustomApi()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
-        $payment = $factory->create(array('payum.api' => new \stdClass()));
+        $gateway = $factory->create(array('payum.api' => new \stdClass()));
 
-        $this->assertInstanceOf('Payum\Core\Payment', $payment);
+        $this->assertInstanceOf('Payum\Core\Gateway', $gateway);
 
-        $this->assertAttributeNotEmpty('apis', $payment);
-        $this->assertAttributeNotEmpty('actions', $payment);
+        $this->assertAttributeNotEmpty('apis', $gateway);
+        $this->assertAttributeNotEmpty('actions', $gateway);
 
-        $extensions = $this->readAttribute($payment, 'extensions');
+        $extensions = $this->readAttribute($gateway, 'extensions');
         $this->assertAttributeNotEmpty('extensions', $extensions);
     }
 
     /**
      * @test
      */
-    public function shouldAllowCreatePaymentConfig()
+    public function shouldAllowCreateGatewayConfig()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
         $config = $factory->createConfig();
 
@@ -97,9 +97,9 @@ class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldAddDefaultConfigPassedInConstructorWhileCreatingPaymentConfig()
+    public function shouldAddDefaultConfigPassedInConstructorWhileCreatingGatewayConfig()
     {
-        $factory = new JsPaymentFactory(array(
+        $factory = new StripeJsGatewayFactory(array(
             'foo' => 'fooVal',
             'bar' => 'barVal',
         ));
@@ -120,7 +120,7 @@ class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldConfigContainDefaultOptions()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
         $config = $factory->createConfig();
 
@@ -135,7 +135,7 @@ class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldConfigContainFactoryNameAndTitle()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
         $config = $factory->createConfig();
 
@@ -156,7 +156,7 @@ class JsPaymentFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldThrowIfRequiredOptionsNotPassed()
     {
-        $factory = new JsPaymentFactory();
+        $factory = new StripeJsGatewayFactory();
 
         $factory->create();
     }

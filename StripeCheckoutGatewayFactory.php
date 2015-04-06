@@ -2,20 +2,20 @@
 namespace Payum\Stripe;
 
 use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\PaymentFactory as CorePaymentFactory;
-use Payum\Core\PaymentFactoryInterface;
+use Payum\Core\GatewayFactory as CoreGatewayFactory;
+use Payum\Core\GatewayFactoryInterface;
 use Payum\Stripe\Action\Api\CreateChargeAction;
 use Payum\Stripe\Action\Api\ObtainTokenAction;
 use Payum\Stripe\Action\CaptureAction;
 use Payum\Stripe\Action\FillOrderDetailsAction;
 use Payum\Stripe\Action\StatusAction;
 
-class CheckoutPaymentFactory implements PaymentFactoryInterface
+class StripeCheckoutGatewayFactory implements GatewayFactoryInterface
 {
     /**
-     * @var PaymentFactoryInterface
+     * @var GatewayFactoryInterface
      */
-    protected $corePaymentFactory;
+    protected $coreGatewayFactory;
 
     /**
      * @var array
@@ -24,11 +24,11 @@ class CheckoutPaymentFactory implements PaymentFactoryInterface
 
     /**
      * @param array $defaultConfig
-     * @param PaymentFactoryInterface $corePaymentFactory
+     * @param GatewayFactoryInterface $coreGatewayFactory
      */
-    public function __construct(array $defaultConfig = array(), PaymentFactoryInterface $corePaymentFactory = null)
+    public function __construct(array $defaultConfig = array(), GatewayFactoryInterface $coreGatewayFactory = null)
     {
-        $this->corePaymentFactory = $corePaymentFactory ?: new CorePaymentFactory();
+        $this->coreGatewayFactory = $coreGatewayFactory ?: new CoreGatewayFactory();
         $this->defaultConfig = $defaultConfig;
     }
 
@@ -37,7 +37,7 @@ class CheckoutPaymentFactory implements PaymentFactoryInterface
      */
     public function create(array $config = array())
     {
-        return $this->corePaymentFactory->create($this->createConfig($config));
+        return $this->coreGatewayFactory->create($this->createConfig($config));
     }
 
     /**
@@ -47,7 +47,7 @@ class CheckoutPaymentFactory implements PaymentFactoryInterface
     {
         $config = ArrayObject::ensureArrayObject($config);
         $config->defaults($this->defaultConfig);
-        $config->defaults($this->corePaymentFactory->createConfig((array) $config));
+        $config->defaults($this->coreGatewayFactory->createConfig((array) $config));
 
         $config->defaults(array(
             'payum.factory_name' => 'stripe_checkout',
