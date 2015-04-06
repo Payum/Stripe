@@ -3,7 +3,7 @@ namespace Payum\Stripe;
 
 use Payum\Core\Bridge\Spl\ArrayObject;
 
-class JsPaymentFactory extends CheckoutPaymentFactory
+class StripeJsGatewayFactory extends StripeCheckoutGatewayFactory
 {
     /**
      * {@inheritDoc}
