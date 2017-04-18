@@ -5,7 +5,8 @@
 {% block payum_body %}
     {{ parent() }}
 
-    <form action="{{ actionUrl|default('') }}" method="POST" id="payment-form">
+    <!-- First form, shown to use. Second form sent to server -->
+    <form action="{{ actionUrl|default('') }}" method="POST" id="payum_stripe_js-payment-form">
         <span class="payment-errors"></span>
 
         <div class="form-row">
@@ -30,8 +31,10 @@
             <span> / </span>
             <input type="text" size="4" data-stripe="exp-year"/>
         </div>
-
         <button type="submit">Submit Payment</button>
+    </form>
+    <form action="{{ actionUrl|default('') }}" method="POST">
+        <input type="hidden" name="stripeToken" id="payum_stripe_js-token" />
     </form>
 {% endblock %}
 
@@ -40,48 +43,54 @@
 
     <!-- The required Stripe lib -->
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-
-    <!-- jQuery is used only for this example; it isn't required to use Stripe -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 {% endblock %}
 
 {% block payum_javascripts %}
     {{ parent() }}
 
     <script type="text/javascript">
-        jQuery(function($) {
-            $('#payment-form').submit(function(e) {
-                var $form = $(this);
-
-                // Disable the submit button to prevent repeated clicks
-                $form.find('button').prop('disabled', true);
-
-                // This identifies your website in the createToken call below
-                Stripe.setPublishableKey({{ publishable_key|json_encode|raw }});
-
-                Stripe.card.createToken($form, stripeResponseHandler);
-
-                // Prevent the form from submitting with the default action
-                return false;
-            });
-
+        document.getElementById('payum_stripe_js-payment-form').addEventListener('submit', function (e) {
+            // Prevent form submission
+            if (e && e.preventDefault) {
+                e.preventDefault();
+            }
+            var form = this;
             var stripeResponseHandler = function(status, response) {
-                var $form = $('#payment-form');
-
+                // Enable the form again
+                els[0].disabled = false;
+                
                 if (response.error) {
                     // Show the errors on the form
-                    $form.find('.payment-errors').text(response.error.message);
-                    $form.find('button').prop('disabled', false);
-                } else {
-                    // token contains id, last4, and card type
-                    var token = response.id;
-                    // Insert the token into the form so it gets submitted to the server
-                    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-                    // and re-submit
-                    $form.get(0).submit();
+                    form.getElementsByClassName('payment-errors')[0].innerText = response.error.message;
+                    return false;
                 }
+                // token contains id, last4, and card type
+                var token = response.id;
+                // Insert the token into the form so it gets submitted to the server
+                var el = document.getElementById('payum_stripe_js-token');
+                el.value = token;
+                // and re-submit
+                el.parentNode.submit();
             };
-        });
+            
+            var els = form.getElementsByTagName('button');
+            
+            // If the button is already disabled, stop here to prevent duplicates
+            if (els[0].disabled) {
+                return false;
+            }
+            
+            // Disable the submit button to prevent repeated clicks
+            els[0].disabled = true;
+
+            // This identifies your website in the createToken call below
+            Stripe.setPublishableKey({{ publishable_key|json_encode|raw }});
+
+            Stripe.card.createToken(form, stripeResponseHandler);
+            
+            // Prevent native form submission
+            return false;
+        }, false);
     </script>
 
 {% endblock %}
