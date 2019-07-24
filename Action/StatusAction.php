@@ -38,7 +38,21 @@ class StatusAction implements ActionInterface
             return;
         }
 
+        // Payment need some client actions to proceed further (when using SCA)
+        if (Constants::STATUS_REQUIRES_ACTION == $model['status']) {
+            $request->markPending();
+
+            return;
+        }
+
         if (Constants::STATUS_FAILED == $model['status']) {
+            $request->markFailed();
+
+            return;
+        }
+
+        // Payment failed while using SCA
+        if (Constants::STATUS_REQUIRES_PAYMENT_METHOD == $model['status']) {
             $request->markFailed();
 
             return;
