@@ -10,9 +10,11 @@ use Payum\Stripe\Action\Api\CreatePlanAction;
 use Payum\Stripe\Action\Api\CreateSubscriptionAction;
 use Payum\Stripe\Action\Api\CreateTokenAction;
 use Payum\Stripe\Action\Api\ObtainTokenAction;
+use Payum\Stripe\Action\Api\ObtainTokenForStrongCustomerAuthenticationAction;
 use Payum\Stripe\Action\CaptureAction;
 use Payum\Stripe\Action\ConvertPaymentAction;
 use Payum\Stripe\Action\GetCreditCardTokenAction;
+use Payum\Stripe\Action\StrongCustomerAuthenticationCaptureAction;
 use Payum\Stripe\Extension\CreateCustomerExtension;
 use Payum\Stripe\Action\StatusAction;
 use Stripe\Stripe;
@@ -35,11 +37,15 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
             'payum.template.obtain_token' => '@PayumStripe/Action/obtain_checkout_token.html.twig',
 
             'payum.action.capture' => new CaptureAction(),
+            'payum.action.capture_sca' => new StrongCustomerAuthenticationCaptureAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.status' => new StatusAction(),
             'payum.action.get_credit_card_token' => new GetCreditCardTokenAction(),
             'payum.action.obtain_token' => function (ArrayObject $config) {
                 return new ObtainTokenAction($config['payum.template.obtain_token']);
+            },
+            'payum.action.obtain_token_for_sca' => function (ArrayObject $config) {
+                return new ObtainTokenForStrongCustomerAuthenticationAction($config['payum.template.obtain_token']);
             },
             'payum.action.create_charge' => new CreateChargeAction(),
             'payum.action.create_customer' => new CreateCustomerAction(),
