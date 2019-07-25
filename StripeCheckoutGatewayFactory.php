@@ -6,6 +6,7 @@ use Payum\Core\Exception\LogicException;
 use Payum\Core\GatewayFactory;
 use Payum\Stripe\Action\Api\CreateChargeAction;
 use Payum\Stripe\Action\Api\CreateCustomerAction;
+use Payum\Stripe\Action\Api\CreatePaymentIntentAction;
 use Payum\Stripe\Action\Api\CreatePlanAction;
 use Payum\Stripe\Action\Api\CreateSubscriptionAction;
 use Payum\Stripe\Action\Api\CreateTokenAction;
@@ -27,7 +28,7 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
     protected function populateConfig(ArrayObject $config)
     {
         if (false == class_exists(Stripe::class)) {
-            throw new LogicException('You must install "stripe/stripe-php:~2.0|~3.0" library.');
+            throw new LogicException('You must install "stripe/stripe-php:^3|^4|^5|^6" library.');
         }
 
         $config->defaults([
@@ -36,17 +37,9 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
 
             'payum.template.obtain_token' => '@PayumStripe/Action/obtain_checkout_token.html.twig',
 
-            'payum.action.capture' => function (ArrayObject $config) {
-                return true === $config['payum.sca_flow'] ? new StrongCustomerAuthenticationCaptureAction() : new CaptureAction();
-            },
             'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.status' => new StatusAction(),
             'payum.action.get_credit_card_token' => new GetCreditCardTokenAction(),
-            'payum.action.obtain_token' => function (ArrayObject $config) {
-                $template = $config['payum.template.obtain_token'];
-                return true === $config['payum.sca_flow'] ? new ObtainTokenForStrongCustomerAuthenticationAction($template) : new ObtainTokenAction($template);
-            },
-            'payum.action.create_charge' => new CreateChargeAction(),
             'payum.action.create_customer' => new CreateCustomerAction(),
             'payum.action.create_plan' => new CreatePlanAction(),
             'payum.action.create_token' => new CreateTokenAction(),
@@ -54,6 +47,29 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
 
             'payum.extension.create_customer' => new CreateCustomerExtension(),
         ]);
+
+        if (true === $config['sca_flow']) {
+            $actions = [
+                'payum.action.capture' => new StrongCustomerAuthenticationCaptureAction(),
+                'payum.action.obtain_token' => function (ArrayObject $config) {
+                    $template = $config['payum.template.obtain_token'];
+
+                    return new ObtainTokenForStrongCustomerAuthenticationAction($template);
+                },
+                'payum.action.create_charge' => new CreatePaymentIntentAction(),
+            ];
+        } else {
+            $actions = [
+                'payum.action.capture' => new CaptureAction(),
+                'payum.action.obtain_token' => function (ArrayObject $config) {
+                    $template = $config['payum.template.obtain_token'];
+                    return new ObtainTokenAction($template);
+                },
+                'payum.action.create_charge' => new CreateChargeAction(),
+            ];
+        }
+
+        $config->defaults($actions);
 
         if (false == $config['payum.api']) {
             $config['payum.default_options'] = [

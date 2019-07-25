@@ -7,9 +7,9 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
+use Payum\Core\Request\Capture;
 use Payum\Stripe\Request\Api\CreatePaymentIntent;
 use Payum\Stripe\Request\Api\ObtainTokenForStrongCustomerAuthentication;
-use Payum\Stripe\Request\StrongCustomerAuthenticationCapture;
 
 /**
  * Class StrongCustomerAuthenticationCaptureAction.
@@ -23,7 +23,7 @@ class StrongCustomerAuthenticationCaptureAction implements ActionInterface, Gate
     /**
      * {@inheritDoc}
      *
-     * @param StrongCustomerAuthenticationCapture $request
+     * @param Capture $request
      */
     public function execute($request)
     {
@@ -54,7 +54,7 @@ class StrongCustomerAuthenticationCaptureAction implements ActionInterface, Gate
     public function supports($request)
     {
         return
-            $request instanceof StrongCustomerAuthenticationCapture &&
+            $request instanceof Capture &&
             $request->getModel() instanceof \ArrayAccess
             ;
     }
