@@ -36,16 +36,15 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
 
             'payum.template.obtain_token' => '@PayumStripe/Action/obtain_checkout_token.html.twig',
 
-            'payum.action.capture' => new CaptureAction(),
-            'payum.action.capture_sca' => new StrongCustomerAuthenticationCaptureAction(),
+            'payum.action.capture' => function (ArrayObject $config) {
+                return true === $config['payum.sca_flow'] ? new StrongCustomerAuthenticationCaptureAction() : new CaptureAction();
+            },
             'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.status' => new StatusAction(),
             'payum.action.get_credit_card_token' => new GetCreditCardTokenAction(),
             'payum.action.obtain_token' => function (ArrayObject $config) {
-                return new ObtainTokenAction($config['payum.template.obtain_token']);
-            },
-            'payum.action.obtain_token_for_sca' => function (ArrayObject $config) {
-                return new ObtainTokenForStrongCustomerAuthenticationAction($config['payum.template.obtain_token']);
+                $template = $config['payum.template.obtain_token'];
+                return true === $config['payum.sca_flow'] ? new ObtainTokenForStrongCustomerAuthenticationAction($template) : new ObtainTokenAction($template);
             },
             'payum.action.create_charge' => new CreateChargeAction(),
             'payum.action.create_customer' => new CreateCustomerAction(),
@@ -59,7 +58,8 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
         if (false == $config['payum.api']) {
             $config['payum.default_options'] = [
                 'publishable_key' => '',
-                'secret_key' => ''
+                'secret_key' => '',
+                'sca_flow' => false,
             ];
             $config->defaults($config['payum.default_options']);
             $config['payum.required_options'] = ['publishable_key', 'secret_key'];
