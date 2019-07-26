@@ -76,6 +76,13 @@ class StatusAction implements ActionInterface
             return;
         }
 
+        // SCA not needed or completed
+        if (Constants::STATUS_SUCCEEDED == $model['status'] && $model['capture_method'] && $model['confirmation_method']) {
+            $request->markCaptured();
+
+            return;
+        }
+
 
         if (Constants::STATUS_SUCCEEDED == $model['status'] && false == $model['captured']) {
             $request->markAuthorized();
