@@ -90,7 +90,7 @@ class RequireConfirmationAction implements ActionInterface, GatewayAwareInterfac
         $this->gateway->execute($renderTemplate = new RenderTemplate($this->templateName, array(
             'model' => $model,
             'publishable_key' => $this->keys->getPublishableKey(),
-            'actionUrl' => $request->getToken() ? $request->getToken()->getTargetUrl() : null,
+            'payment_intent_client_secret' => $model['client_secret'],
         )));
 
         throw new HttpResponse($renderTemplate->getResult());
