@@ -4,6 +4,7 @@ namespace Payum\Stripe;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\LogicException;
 use Payum\Core\GatewayFactory;
+use Payum\Stripe\Action\Api\ConfirmPaymentIntentAction;
 use Payum\Stripe\Action\Api\CreateChargeAction;
 use Payum\Stripe\Action\Api\CreateCustomerAction;
 use Payum\Stripe\Action\Api\CreatePaymentIntentAction;
@@ -13,6 +14,7 @@ use Payum\Stripe\Action\Api\CreateTokenAction;
 use Payum\Stripe\Action\Api\ObtainTokenAction;
 use Payum\Stripe\Action\Api\ObtainTokenForStrongCustomerAuthenticationAction;
 use Payum\Stripe\Action\CaptureAction;
+use Payum\Stripe\Action\ConfirmAction;
 use Payum\Stripe\Action\ConvertPaymentAction;
 use Payum\Stripe\Action\GetCreditCardTokenAction;
 use Payum\Stripe\Action\RequireConfirmationAction;
@@ -58,11 +60,14 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
                     return new ObtainTokenForStrongCustomerAuthenticationAction($template);
                 },
                 'payum.action.create_charge' => new CreatePaymentIntentAction(),
+
+                'payum.action.confirm_payment' => new ConfirmAction(),
                 'payum.action.require_confirmation' => function (ArrayObject $config) {
                     $template = $config['payum.template.require_confirmation'];
 
                     return new RequireConfirmationAction($template);
                 },
+                'payum.action.confirm_payment_intent' => new ConfirmPaymentIntentAction(),
 
                 'payum.template.require_confirmation' => '@PayumStripe/Action/require_confirmation.html.twig',
             ];

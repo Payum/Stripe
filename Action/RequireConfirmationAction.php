@@ -82,7 +82,7 @@ class RequireConfirmationAction implements ActionInterface, GatewayAwareInterfac
         $getHttpRequest = new GetHttpRequest();
         $this->gateway->execute($getHttpRequest);
         if ($getHttpRequest->method == 'POST' && isset($getHttpRequest->request['stripeToken'])) {
-            $model['card'] = $getHttpRequest->request['stripeToken'];
+            $model['confirmation'] = $getHttpRequest->request['stripeToken'];
 
             return;
         }
