@@ -59,7 +59,7 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
                 },
                 'payum.action.create_charge' => new CreatePaymentIntentAction(),
                 'payum.action.require_confirmation' => function (ArrayObject $config) {
-                    $template = $config['payum.template.obtain_token'];
+                    $template = $config['payum.template.require_confirmation'];
 
                     return new RequireConfirmationAction($template);
                 },
