@@ -39,7 +39,10 @@ class StatusAction implements ActionInterface
         }
 
         // Payment need some client actions to proceed further (when using SCA)
-        if (Constants::STATUS_REQUIRES_ACTION == $model['status']) {
+        if (Constants::STATUS_REQUIRES_ACTION == $model['status']
+            && isset($model['next_action'], $model['next_action']['type'])
+            && Constants::NEXT_ACTION_TYPE == $model['next_action']['type']
+        ) {
             $request->markPending();
 
             return;

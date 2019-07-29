@@ -15,6 +15,7 @@ use Payum\Stripe\Action\Api\ObtainTokenForStrongCustomerAuthenticationAction;
 use Payum\Stripe\Action\CaptureAction;
 use Payum\Stripe\Action\ConvertPaymentAction;
 use Payum\Stripe\Action\GetCreditCardTokenAction;
+use Payum\Stripe\Action\RequireConfirmationAction;
 use Payum\Stripe\Action\StrongCustomerAuthenticationCaptureAction;
 use Payum\Stripe\Extension\CreateCustomerExtension;
 use Payum\Stripe\Action\StatusAction;
@@ -57,12 +58,20 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
                     return new ObtainTokenForStrongCustomerAuthenticationAction($template);
                 },
                 'payum.action.create_charge' => new CreatePaymentIntentAction(),
+                'payum.action.require_confirmation' => function (ArrayObject $config) {
+                    $template = $config['payum.template.obtain_token'];
+
+                    return new RequireConfirmationAction($template);
+                },
+
+                'payum.template.require_confirmation' => '@PayumStripe/Action/require_confirmation.html.twig',
             ];
         } else {
             $actions = [
                 'payum.action.capture' => new CaptureAction(),
                 'payum.action.obtain_token' => function (ArrayObject $config) {
                     $template = $config['payum.template.obtain_token'];
+
                     return new ObtainTokenAction($template);
                 },
                 'payum.action.create_charge' => new CreateChargeAction(),
