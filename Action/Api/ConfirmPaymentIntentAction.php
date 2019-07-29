@@ -6,11 +6,14 @@ use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
 use Payum\Core\Bridge\Spl\ArrayObject;
+use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\ConfirmPaymentIntent;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
 /**
  * Class ConfirmPaymentIntentAction.
@@ -57,7 +60,16 @@ class ConfirmPaymentIntentAction implements ActionInterface, GatewayAwareInterfa
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        // TODO
+        if (false == $model['payment_intent']) {
+            throw new LogicException('The payment intent id has to be set.');
+        }
+
+        Stripe::setApiKey($this->keys->getSecretKey());
+
+        $intent = PaymentIntent::retrieve($model['payment_intent']);
+        $intent->confirm();
+
+        $model->replace($intent->__toArray(true));
     }
 
     /**

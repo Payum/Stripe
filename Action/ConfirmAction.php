@@ -31,7 +31,7 @@ class ConfirmAction implements ActionInterface, GatewayAwareInterface
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (false == $model['confirmation']) {
+        if (false == $model['payment_intent']) {
             $confirmation = new RequireConfirmation($model);
             $confirmation->setModel($model);
 
