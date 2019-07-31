@@ -9,7 +9,7 @@ class Constants
 
     const STATUS_FAILED = 'failed';
 
-    const STATUS_REQUIRES_ACTION = 'requires_source_action';
+    const STATUS_REQUIRES_ACTION = 'requires_action';
 
     const STATUS_REQUIRES_PAYMENT_METHOD = 'requires_payment_method';
 
