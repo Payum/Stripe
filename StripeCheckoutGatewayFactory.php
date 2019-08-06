@@ -13,6 +13,7 @@ use Payum\Stripe\Action\Api\CreateSubscriptionAction;
 use Payum\Stripe\Action\Api\CreateTokenAction;
 use Payum\Stripe\Action\Api\ObtainTokenAction;
 use Payum\Stripe\Action\Api\ObtainTokenForStrongCustomerAuthenticationAction;
+use Payum\Stripe\Action\Api\CreateSetupIntentAction;
 use Payum\Stripe\Action\CaptureAction;
 use Payum\Stripe\Action\ConfirmAction;
 use Payum\Stripe\Action\ConvertPaymentAction;
@@ -68,6 +69,7 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
                     return new RequireConfirmationAction($template);
                 },
                 'payum.action.confirm_payment_intent' => new ConfirmPaymentIntentAction(),
+                'payum.action.create_setup_intent' => new CreateSetupIntentAction(),
 
                 'payum.template.require_confirmation' => '@PayumStripe/Action/require_confirmation.html.twig',
             ];
