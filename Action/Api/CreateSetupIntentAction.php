@@ -23,7 +23,6 @@ class CreateSetupIntentAction implements ActionInterface, ApiAwareInterface
     use ApiAwareTrait {
         setApi as _setApi;
     }
-//    use GatewayAwareTrait;
 
     /**
      * @deprecated BC will be removed in 2.x. Use $this->api
@@ -61,10 +60,7 @@ class CreateSetupIntentAction implements ActionInterface, ApiAwareInterface
         try {
             Stripe::setApiKey($this->keys->getSecretKey());
 
-            $setup = SetupIntent::create(array_merge($model->toUnsafeArrayWithoutLocal(), [
-                'confirmation_method' => 'manual',
-                'confirm' => true,
-            ]));
+            $setup = SetupIntent::create($model->toUnsafeArrayWithoutLocal());
 
             $model->replace($setup->__toArray(true));
         } catch (Error\Base $e) {
