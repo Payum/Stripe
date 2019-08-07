@@ -20,6 +20,12 @@ class StatusAction implements ActionInterface
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
+        if ($model['error'] && Constants::STATUS_AUTHENTICATION_REQUIRED == $model['error']['code']) {
+            $request->markPending();
+
+            return;
+        }
+
         if ($model['error']) {
             $request->markFailed();
 
