@@ -12,6 +12,7 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\ConfirmPaymentIntent;
+use Stripe\Error\Base;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
@@ -71,7 +72,7 @@ class ConfirmPaymentIntentAction implements ActionInterface, GatewayAwareInterfa
             $intent->confirm();
 
             $model->replace($intent->__toArray(true));
-        } catch (Error\Base $e) {
+        } catch (Base $e) {
             $model->replace($e->getJsonBody());
         }
     }

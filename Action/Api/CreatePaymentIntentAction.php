@@ -11,7 +11,7 @@ use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\CreatePaymentIntent;
-use Stripe\Error;
+use Stripe\Error\Base;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
@@ -77,7 +77,7 @@ class CreatePaymentIntentAction implements ActionInterface, ApiAwareInterface
             ]));
 
             $model->replace($charge->__toArray(true));
-        } catch (Error\Base $e) {
+        } catch (Base $e) {
             $model->replace($e->getJsonBody());
         }
     }

@@ -9,7 +9,7 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\CreateSetupIntent;
-use Stripe\Error;
+use Stripe\Error\Base;
 use Stripe\SetupIntent;
 use Stripe\Stripe;
 
@@ -63,7 +63,7 @@ class CreateSetupIntentAction implements ActionInterface, ApiAwareInterface
             $setup = SetupIntent::create($model->toUnsafeArrayWithoutLocal());
 
             $model->replace($setup->__toArray(true));
-        } catch (Error\Base $e) {
+        } catch (Base $e) {
             $model->replace($e->getJsonBody());
         }
     }
