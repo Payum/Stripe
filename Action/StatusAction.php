@@ -20,7 +20,7 @@ class StatusAction implements ActionInterface
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        if ($model['error'] && Constants::STATUS_AUTHENTICATION_REQUIRED == $model['error']['code']) {
+        if ($model['error'] && isset($model['error']['code']) && Constants::STATUS_AUTHENTICATION_REQUIRED == $model['error']['code']) {
             $request->markPending();
 
             return;

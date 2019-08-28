@@ -8,7 +8,6 @@ use Payum\Core\ApiAwareTrait;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\GatewayAwareTrait;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\CreatePaymentIntent;
 use Stripe\Error\Base;
@@ -25,7 +24,6 @@ class CreatePaymentIntentAction implements ActionInterface, ApiAwareInterface
     use ApiAwareTrait {
         setApi as _setApi;
     }
-    use GatewayAwareTrait;
 
     /**
      * @deprecated BC will be removed in 2.x. Use $this->api

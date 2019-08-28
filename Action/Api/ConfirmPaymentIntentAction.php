@@ -8,8 +8,6 @@ use Payum\Core\ApiAwareTrait;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\GatewayAwareInterface;
-use Payum\Core\GatewayAwareTrait;
 use Payum\Stripe\Keys;
 use Payum\Stripe\Request\Api\ConfirmPaymentIntent;
 use Stripe\Error\Base;
@@ -21,12 +19,11 @@ use Stripe\Stripe;
  *
  * @author Eric Masoero <em@studeal.fr>
  */
-class ConfirmPaymentIntentAction implements ActionInterface, GatewayAwareInterface, ApiAwareInterface
+class ConfirmPaymentIntentAction implements ActionInterface, ApiAwareInterface
 {
     use ApiAwareTrait {
         setApi as _setApi;
     }
-    use GatewayAwareTrait;
 
     /**
      * @deprecated BC will be removed in 2.x. Use $this->api

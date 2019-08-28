@@ -238,4 +238,66 @@ class StatusActionTest extends GenericActionTest
 
         $this->assertTrue($status->isUnknown());
     }
+
+    public function testItShouldMarkPendingIfDetailsHasErrorSetWithAuthenticationRequired()
+    {
+        $action = new StatusAction();
+
+        $model = [
+            'error' => [
+                'type' => 'invalid_request_error',
+                'message' => 'Amount must be at least 50 cents',
+                'param' => 'amount',
+                'code' => Constants::STATUS_AUTHENTICATION_REQUIRED,
+            ],
+        ];
+
+        $action->execute($status = new GetHumanStatus($model));
+
+        $this->assertTrue($status->isPending());
+    }
+
+    public function testItShouldMarkPendingIfNextActionIsToUseStripeSDK()
+    {
+        $action = new StatusAction();
+
+        $model = [
+            'status' => Constants::STATUS_REQUIRES_ACTION,
+            'next_action' => [
+                'type' => Constants::NEXT_ACTION_TYPE,
+            ],
+        ];
+
+        $action->execute($status = new GetHumanStatus($model));
+
+        $this->assertTrue($status->isPending());
+    }
+
+    public function testItShouldMarkFailedIfPaymentRequiresPaymentMethod()
+    {
+        $action = new StatusAction();
+
+        $model = [
+            'status' => Constants::STATUS_REQUIRES_PAYMENT_METHOD,
+        ];
+
+        $action->execute($status = new GetHumanStatus($model));
+
+        $this->assertTrue($status->isFailed());
+    }
+
+    public function testItShouldMarkCapturedIfSucceededWithCaptureMethodAndConfirmationMethod()
+    {
+        $action = new StatusAction();
+
+        $model = [
+            'status' => Constants::STATUS_SUCCEEDED,
+            'capture_method' => 'something',
+            'confirmation_method' => 'something else',
+        ];
+
+        $action->execute($status = new GetHumanStatus($model));
+
+        $this->assertTrue($status->isCaptured());
+    }
 }
