@@ -1,0 +1,60 @@
+{% extends layout ?: "@PayumCore/layout.html.twig" %}
+
+{% block payum_body %}
+    {{ parent() }}
+
+    <form action="{{ actionUrl|default('') }}" method="POST" id="confirm-form">
+        <button type="submit">Confirm Payment</button>
+    </form>
+{% endblock %}
+
+{% block payum_vendor_javascripts %}
+    {{ parent() }}
+
+    <!-- The required Stripe lib -->
+    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+
+    <!-- jQuery is used only for this example; it isn't required to use Stripe -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block payum_javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        jQuery(function($) {
+            $('#confirm-form').submit(function(e) {
+                var $form = $(this);
+
+                // Disable the submit button to prevent repeated clicks
+                $form.find('button').prop('disabled', true);
+
+                // This identifies your website in the call below
+                Stripe.setPublishableKey({{ publishable_key|json_encode|raw }});
+
+                Stripe.handleCardAction('{{ payment_intent_client_secret }}', stripeResponseHandler);
+
+                // Prevent the form from submitting with the default action
+                return false;
+            });
+
+            var stripeResponseHandler = function(status, response) {
+                var $form = $('#confirm-form');
+
+                if (response.error) {
+                    // Show the errors on the form
+                    $form.find('.payment-errors').text(response.error.message);
+                    $form.find('button').prop('disabled', false);
+                } else {
+                    // token is the confirmed payment intent's id
+                    var token = response.paymentIntent.id;
+                    // Insert the token into the form so it gets submitted to the server
+                    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+                    // and re-submit
+                    $form.get(0).submit();
+                }
+            };
+        });
+    </script>
+
+{% endblock %}
