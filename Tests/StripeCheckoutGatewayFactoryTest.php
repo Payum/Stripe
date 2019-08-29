@@ -127,7 +127,7 @@ class StripeCheckoutGatewayFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertInternalType('array', $config);
 
         $this->assertArrayHasKey('payum.default_options', $config);
-        $this->assertEquals(array('publishable_key' => '', 'secret_key' => ''), $config['payum.default_options']);
+        $this->assertEquals(['publishable_key' => '', 'secret_key' => '', 'sca_flow' => false], $config['payum.default_options']);
     }
 
     /**
