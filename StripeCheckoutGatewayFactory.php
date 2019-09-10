@@ -22,6 +22,7 @@ use Payum\Stripe\Action\RequireConfirmationAction;
 use Payum\Stripe\Action\StrongCustomerAuthenticationCaptureAction;
 use Payum\Stripe\Extension\CreateCustomerExtension;
 use Payum\Stripe\Action\StatusAction;
+use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
 class StripeCheckoutGatewayFactory extends GatewayFactory
@@ -31,8 +32,8 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
      */
     protected function populateConfig(ArrayObject $config)
     {
-        if (false == class_exists(Stripe::class)) {
-            throw new LogicException('You must install "stripe/stripe-php:^3|^4|^5|^6" library.');
+        if (false === class_exists(Stripe::class)) {
+            throw new LogicException('You must install "stripe/stripe-php:^3|^4|^5|^6|^7" library.');
         }
 
         $config->defaults([
@@ -53,6 +54,10 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
         ]);
 
         if (true === $config['sca_flow']) {
+            if (false === class_exists(PaymentIntent::class)) {
+                throw new LogicException('You must install "stripe/stripe-php:^6.9" at least to use SCA flow');
+            }
+
             $actions = [
                 'payum.action.capture' => new StrongCustomerAuthenticationCaptureAction(),
                 'payum.action.obtain_token' => function (ArrayObject $config) {
