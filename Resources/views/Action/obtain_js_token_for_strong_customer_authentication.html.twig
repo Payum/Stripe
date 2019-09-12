@@ -55,9 +55,9 @@
                 $form.find('button').prop('disabled', true);
 
                 // This identifies your website in the call below
-                Stripe.setPublishableKey({{ publishable_key|json_encode|raw }});
+                var stripe = Stripe({{ publishable_key|json_encode|raw }});
 
-                Stripe.createPaymentMethod('card', $form, stripeResponseHandler);
+                stripe.createPaymentMethod('card', $form, stripeResponseHandler);
 
                 // Prevent the form from submitting with the default action
                 return false;
