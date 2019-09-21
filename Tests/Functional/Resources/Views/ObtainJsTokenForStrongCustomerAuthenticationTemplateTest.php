@@ -22,8 +22,8 @@ class ObtainJsTokenForStrongCustomerAuthenticationTemplateTest extends TestCase
 
         $this->assertContains('https://js.stripe.com/v3/', $result);
 
-        $this->assertContains('Stripe.setPublishableKey("theKey");', $result);
-        $this->assertContains('Stripe.createPaymentMethod', $result);
+        $this->assertContains('var stripe = Stripe("theKey");', $result);
+        $this->assertContains('stripe.createPaymentMethod', $result);
 
         $this->assertContains('var token = response.paymentMethod;', $result);
     }
