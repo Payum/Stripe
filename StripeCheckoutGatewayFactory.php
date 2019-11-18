@@ -48,6 +48,8 @@ class StripeCheckoutGatewayFactory extends GatewayFactory
             'payum.action.create_subscription' => new CreateSubscriptionAction(),
 
             'payum.extension.create_customer' => new CreateCustomerExtension(),
+            
+            'payum.action.create_product' => new CreateProductAction(),
         ]);
 
         if (false == $config['payum.api']) {
