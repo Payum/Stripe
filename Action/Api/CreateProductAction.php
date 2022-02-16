@@ -1,7 +1,6 @@
 <?php
 namespace Payum\Stripe\Action\Api;
 
-use Composer\InstalledVersions;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\ApiAwareTrait;
@@ -9,18 +8,17 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
-use Payum\Stripe\Constants;
 use Payum\Stripe\Keys;
-use Payum\Stripe\Request\Api\CreateCustomer;
-use Stripe\Customer;
-use Stripe\Exception;
+use Payum\Stripe\Request\Api\CreateProduct;
+use Stripe\Error;
+use Stripe\Product;
 use Stripe\Stripe;
 
 /**
  * @param Keys $keys
  * @param Keys $api
  */
-class CreateCustomerAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+class CreateProductAction implements ActionInterface, GatewayAwareInterface, ApiAwareInterface
 {
     use ApiAwareTrait {
         setApi as _setApi;
@@ -55,26 +53,18 @@ class CreateCustomerAction implements ActionInterface, ApiAwareInterface, Gatewa
      */
     public function execute($request)
     {
-        /** @var $request CreateCustomer */
+        /** @var $request CreatePlan */
         RequestNotSupportedException::assertSupports($this, $request);
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
         try {
-            Stripe::setApiKey($this->api->getSecretKey());
+            Stripe::setApiKey($this->keys->getSecretKey());
+            
+            $product = Product::create($model->toUnsafeArrayWithoutLocal());
 
-            if (class_exists(InstalledVersions::class)) {
-                Stripe::setAppInfo(
-                    Constants::PAYUM_STRIPE_APP_NAME,
-                    InstalledVersions::getVersion('stripe/stripe-php'),
-                    Constants::PAYUM_URL
-                );
-            }
-
-            $customer = Customer::create($model->toUnsafeArrayWithoutLocal());
-
-            $model->replace($customer->toArray(true));
-        } catch (Exception\ApiErrorException $e) {
+            $model->replace($plan->__toArray(true));
+        } catch (Error\Base $e) {
             $model->replace($e->getJsonBody());
         }
     }
@@ -85,7 +75,7 @@ class CreateCustomerAction implements ActionInterface, ApiAwareInterface, Gatewa
     public function supports($request)
     {
         return
-            $request instanceof CreateCustomer &&
+            $request instanceof CreateProduct &&
             $request->getModel() instanceof \ArrayAccess
         ;
     }
